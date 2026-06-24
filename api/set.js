@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -7,9 +9,10 @@ export default async function handler(req, res) {
   if (!key) return res.status(400).json({ error: 'Missing key' });
 
   try {
-    await kv.set(key, value);
+    await redis.set(key, value);
     return res.status(200).json({ success: true });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error("Redis Write Error:", error);
+    return res.status(500).json({ error: error.message, details: "Failed to write to standard Redis." });
   }
 }
