@@ -4,6 +4,7 @@ import { Redis } from 'ioredis';
 const redis = new Redis(process.env.REDIS_URL);
 
 export default async function handler(req, res) {
+  await redis.flushall();
   const { key } = req.query;
   if (!key) return res.status(400).json({ error: 'Missing key' });
 
