@@ -150,7 +150,7 @@ input[type=text]::placeholder{color:var(--txd)}
 .rk-bar{position:absolute;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--pu),var(--cy));border-radius:0 3px 3px 0;transition:width 1.2s ease .15s}
 .priv-tasks{margin-top:9px;padding-top:9px;border-top:1px solid var(--bd)}
 .ptrow{font-size:.73rem;color:var(--txd);display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:wrap}
-.pt-pts{color:var(--pul)}.pt-pf{color:var(--gr);font-size:.64rem}.pt-bon{color:var(--go);font-size:.64rem}
+.pt-pts{color:var(--pul)}.pt-pf{color:var(--gr);font-size:.64rem}.pt-bon{color:var(--go);font-size:.64rem}.pt-dur{color:var(--txd);font-size:.63rem;font-style:italic}
 
 /* ═══════════ TROPHY ═══════════ */
 .sec-card{background:var(--gl);border:1px solid var(--bd);border-radius:var(--rad);padding:22px 20px;margin-bottom:13px;backdrop-filter:blur(10px);text-align:center}
@@ -265,6 +265,16 @@ input[type=text]::placeholder{color:var(--txd)}
 .j-refl::placeholder{color:var(--txd)}
 .j-save-btn{width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--pu),var(--cy));border:none;border-radius:var(--rads);color:#fff;font-size:.88rem;font-weight:700;font-family:inherit;cursor:pointer;touch-action:manipulation;transition:transform .15s}
 .j-save-btn:active{transform:scale(.97)}
+
+/* DURATION PILLS */
+.dur-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px}
+.durbtn{padding:7px 13px;background:var(--gl);border:1.5px solid var(--bd);border-radius:20px;cursor:pointer;transition:all .18s;font-family:inherit;color:var(--txd);font-size:.78rem;font-weight:600;touch-action:manipulation;white-space:nowrap}
+.durbtn.sel{border-color:var(--pu);background:rgba(124,58,237,.2);color:var(--tx)}
+.durbtn:active{transform:scale(.93)}
+/* REQUIRED FIELDS */
+.req-star{color:#ef4444;font-size:.72rem;font-weight:700;margin-left:3px}
+.proof-zone.err{border-color:#ef4444 !important;animation:shakeX .45s ease}
+@keyframes shakeX{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
 </style>
 </head>
 <body>
@@ -348,7 +358,7 @@ input[type=text]::placeholder{color:var(--txd)}
     <!-- GOALS -->
     <div id="pg-goals" class="tab-pg">
       <div class="sec-t">⭐ My Daily Goals</div>
-      <div class="goals-info">✅ Check off goals to earn <strong style="color:var(--gr)">+10 pts</strong> each · Goals reset daily · Your goals are saved on this device</div>
+      <div class="goals-info">⏱ Tap a goal to log how long it took &amp; earn points · Scales from <strong style="color:var(--gr)">4 – 38 pts</strong> based on duration · Goals reset daily</div>
       <div id="goals-list"></div>
       <div class="goal-add-row">
         <input type="text" id="goal-inp" placeholder="Add a new goal..." maxlength="60" style="flex:1">
@@ -398,22 +408,44 @@ input[type=text]::placeholder{color:var(--txd)}
     </div>
     <label class="flbl">What did you accomplish?</label>
     <div class="type-grid" id="type-grid"></div>
+    <div style="margin-bottom:16px">
+      <label class="flbl">How long did you work?<span class="req-star">✱</span></label>
+      <div class="dur-grid" id="dur-grid"></div>
+    </div>
     <div style="margin-bottom:14px">
       <label class="flbl">Custom Name (optional)</label>
-      <input type="text" id="task-nm" placeholder="e.g. Studied for 2 hours" style="width:100%">
+      <input type="text" id="task-nm" placeholder="e.g. Morning study session" style="width:100%">
     </div>
     <div class="bonus-info" id="bon-info">🔥 Build a streak for bonus points!</div>
     <div style="margin-bottom:14px">
-      <label class="flbl">Upload Proof (Photo / Video)</label>
-      <div class="proof-zone" onclick="document.getElementById('proof-file').click()">
+      <label class="flbl">Upload Proof<span class="req-star">✱ Required</span></label>
+      <div class="proof-zone" id="proof-zone" onclick="document.getElementById('proof-file').click()">
         <span class="pz-ico">📸</span>
-        <div class="pz-txt">Tap to add photo or video proof</div>
+        <div class="pz-txt">Tap to upload a photo or video</div>
       </div>
       <input type="file" id="proof-file" accept="image/*,video/*" style="display:none">
       <div class="proof-ok" id="proof-ok">✅ Proof uploaded!</div>
       <img class="proof-img" id="proof-img" alt="">
     </div>
     <button class="btn-sub" id="btn-sub">🚀 Log Points</button>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- GOAL COMPLETE MODAL -->
+<div class="modal-ov" id="goal-modal">
+  <div class="modal-sh">
+    <div class="m-handle"></div>
+    <div class="modal-hdr">
+      <button class="modal-back-btn" onclick="closeGoalModal()">‹ Back</button>
+      <div class="m-title">⭐ Goal Complete!</div>
+    </div>
+    <div id="gm-goal-name" style="font-size:.87rem;color:var(--txd);text-align:center;margin:-4px 0 16px;padding:9px 14px;background:var(--gl);border-radius:var(--rads);border:1px solid var(--bd);line-height:1.45"></div>
+    <label class="flbl">How long did this take?<span class="req-star">✱</span></label>
+    <div class="dur-grid" id="goal-dur-grid"></div>
+    <div style="height:14px"></div>
+    <div class="bonus-info" id="goal-bon-info">⭐ Select a duration to see your points</div>
+    <button class="btn-sub" style="margin-top:12px" onclick="submitGoalCompletion()">✅ Complete Goal</button>
     <div style="height:10px"></div>
   </div>
 </div>
@@ -429,19 +461,32 @@ const FRIENDS = ['NAKSHATRA','ANSHUMAN','KUNAL','USHAB','ADITYA','JAWLINE'];
 const COLORS  = ['#7c3aed','#06b6d4','#ec4899','#f59e0b','#10b981','#8b5cf6'];
 const TYPES = [
   {id:'workout', n:'Workout',  e:'💪', p:50},
-  {id:'reading', n:'Journaling',     e:'📖', p:25},
-  {id:'coding',  n:'Code',     e:'⌨️', p:50},
-  {id:'writing', n:'Write',    e:'✍️', p:10},
-  {id:'running', n:'Run',      e:'🏃', p:30},
-  {id:'meditate',n:'Meditate(5min)', e:'🧘', p:10},
-  {id:'healthy', n:'Eat healthy',  e:'🍎', p:20},
-  {id:'language',n:'Language', e:'🗣️', p:5}
+  {id:'study',   n:'Study',    e:'📚', p:45},
+  {id:'reading', n:'Read',     e:'📖', p:35},
+  {id:'coding',  n:'Code',     e:'⌨️', p:55},
+  {id:'project', n:'Project',  e:'💼', p:60},
+  {id:'writing', n:'Write',    e:'✍️', p:40},
+  {id:'running', n:'Run',      e:'🏃', p:45},
+  {id:'meditate',n:'Meditate', e:'🧘', p:25},
+  {id:'creative',n:'Create',   e:'🎨', p:40},
+  {id:'healthy', n:'Healthy',  e:'🍎', p:20},
+  {id:'language',n:'Language', e:'🗣️', p:40}
+];
+const DURATIONS = [
+  {label:'15 min', mins:15,  mult:0.25},
+  {label:'30 min', mins:30,  mult:0.5},
+  {label:'45 min', mins:45,  mult:0.75},
+  {label:'1 hr',   mins:60,  mult:1.0},
+  {label:'1.5 hr', mins:90,  mult:1.4},
+  {label:'2 hr',   mins:120, mult:1.8},
+  {label:'3 hr+',  mins:180, mult:2.5},
 ];
 
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
-let USER = null, curTab='home', lbMode='priv', selType=TYPES[0], hasProof=false, toastTmr=null;
+let USER = null, curTab='home', lbMode='priv', selType=TYPES[0], selDuration=DURATIONS[3], hasProof=false, toastTmr=null;
+let pendingGoalId=null, selGoalDuration=DURATIONS[1];
 const today     = () => new Date().toISOString().split('T')[0];
 const yesterday = () => { const d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; };
 const uColor    = n => { const i=FRIENDS.indexOf(n); if(i>=0)return COLORS[i]; let h=0; for(const c of n)h=(h*31+c.charCodeAt(0))>>>0; return COLORS[h%COLORS.length]; };
@@ -584,7 +629,7 @@ function renderTasks(tasks, id){
     const d=document.createElement('div');
     d.className='tc'; d.style.animationDelay=(i*50)+'ms';
     d.innerHTML=`<div class="tc-e">${t.e}</div>
-    <div class="tc-i"><div class="tc-n">${t.name}</div><div class="tc-s">${t.time}${t.bonus>0?' · +'+t.bonus+' 🔥 streak bonus':''}</div></div>
+    <div class="tc-i"><div class="tc-n">${t.name}</div><div class="tc-s">${t.time}${t.duration?' · '+t.duration:''}${t.bonus>0?' · +'+t.bonus+' 🔥 streak bonus':''}</div></div>
     ${t.proof?'<div class="tc-pf">✓ Proof</div>':''}
     <div class="tc-p">+${t.pts}</div>`;
     el.appendChild(d);
@@ -594,43 +639,78 @@ function renderTasks(tasks, id){
 // ═══════════════════════════════════════════
 //  ADD TASK MODAL
 // ═══════════════════════════════════════════
+function initDurGrid(gridId, onSelect, defaultDur){
+  const grid=document.getElementById(gridId); if(!grid) return;
+  grid.innerHTML='';
+  DURATIONS.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='durbtn'+(d===defaultDur?' sel':'');
+    b.textContent=d.label;
+    b.onclick=()=>{ grid.querySelectorAll('.durbtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); onSelect(d); };
+    grid.appendChild(b);
+  });
+}
+
 function initModal(){
   const grid=document.getElementById('type-grid');
   TYPES.forEach((t,i)=>{
     const b=document.createElement('div');
     b.className='tybtn'+(i===0?' sel':'');
     b.id='tt_'+t.id;
-    b.innerHTML=`<span class="ty-ico">${t.e}</span><span class="ty-nm">${t.n}</span><span class="ty-p">+${t.p}</span>`;
+    b.innerHTML=`<span class="ty-ico">${t.e}</span><span class="ty-nm">${t.n}</span><span class="ty-p">${t.p}/hr</span>`;
     b.onclick=()=>{ document.querySelectorAll('.tybtn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); selType=t; updPts(); };
     grid.appendChild(b);
   });
+  initDurGrid('dur-grid', d=>{ selDuration=d; updPts(); }, selDuration);
+  initDurGrid('goal-dur-grid', d=>{ selGoalDuration=d; updGoalPts(); }, selGoalDuration);
   document.getElementById('proof-file').onchange=e=>{
     const f=e.target.files[0]; if(!f)return; hasProof=true;
+    document.getElementById('proof-zone').classList.remove('err');
     document.getElementById('proof-ok').style.display='flex';
     if(f.type.startsWith('image/')){ const r=new FileReader(); r.onload=ev=>{ const im=document.getElementById('proof-img'); im.src=ev.target.result; im.style.display='block'; }; r.readAsDataURL(f); }
   };
   document.getElementById('modal').addEventListener('click',e=>{ if(e.target===document.getElementById('modal'))closeModal(); });
+  document.getElementById('goal-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('goal-modal'))closeGoalModal(); });
 }
 
 async function updPts(){
   const users=await getUsers(), streak=(users[USER]||{}).streak||0;
-  const base=selType.p;
+  const base=Math.round(selType.p * selDuration.mult);
   const bonus=Math.round(base*sBonusPct(streak));
+  const total=base+bonus;
+  const durNote=` · ${selDuration.label}`;
   document.getElementById('bon-info').textContent=streak>0
-    ?`🔥 +${bonus} streak bonus (${Math.round(sBonusPct(streak)*100)}% for ${streak}-day streak) · +${base} pts for ${selType.n}`
-    :`⚡ ${base} pts for ${selType.n} · Build a streak for bonus points!`;
+    ?`🔥 ${selType.n}${durNote} = ${base} pts + ${bonus} streak bonus = ${total} total`
+    :`⚡ ${total} pts for ${selType.n}${durNote} · Build a streak for bonus!`;
 }
 
-function openModal(){ document.getElementById('modal').classList.add('open'); document.getElementById('task-nm').value=''; document.getElementById('proof-ok').style.display='none'; document.getElementById('proof-img').style.display='none'; document.getElementById('proof-file').value=''; hasProof=false; updPts(); }
+function openModal(){
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('task-nm').value='';
+  document.getElementById('proof-ok').style.display='none';
+  document.getElementById('proof-img').style.display='none';
+  document.getElementById('proof-file').value='';
+  document.getElementById('proof-zone').classList.remove('err');
+  hasProof=false;
+  selDuration=DURATIONS[3]; // reset to 1hr
+  document.querySelectorAll('#dur-grid .durbtn').forEach((b,i)=>b.classList.toggle('sel',i===3));
+  updPts();
+}
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 
 async function submitTask(){
   if(!USER)return;
+  if(!hasProof){
+    const pz=document.getElementById('proof-zone');
+    pz.classList.add('err');
+    setTimeout(()=>pz.classList.remove('err'),600);
+    showToast('📸 Proof is required to log points!'); return;
+  }
   const name=document.getElementById('task-nm').value.trim()||selType.n;
-  const base=selType.p;
+  const base=Math.round(selType.p * selDuration.mult);
   const users=await getUsers(), streak=(users[USER]||{}).streak||0;
   const bonus=Math.round(base*sBonusPct(streak)), total=base+bonus;
-  const task={ id:Date.now(), name, type:selType.id, e:selType.e, pts:total, base, bonus, proof:hasProof, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
+  const task={ id:Date.now(), name, type:selType.id, e:selType.e, pts:total, base, bonus, proof:hasProof, duration:selDuration.label, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
   const day=today(), daily=await getDaily(day);
   if(!daily[USER]) daily[USER]={score:0,tasks:[]};
   daily[USER].tasks.push(task); daily[USER].score+=total;
@@ -665,7 +745,7 @@ async function refreshLb(){
     const rc=rank===1?'r1':rank===2?'r2':rank===3?'r3':'', nc=rank<=3?['g','s','b'][rank-1]:'';
     const c=uColor(e.name), bw=(e.score/max*100).toFixed(1), isMe=e.name===USER;
     let priv='';
-    if(lbMode==='priv'&&e.tasks.length) priv='<div class="priv-tasks">'+e.tasks.map(t=>`<div class="ptrow">${t.e} ${t.name} <span class="pt-pts">+${t.pts}</span>${t.bonus>0?`<span class="pt-bon">+${t.bonus}🔥</span>`:''}${t.proof?'<span class="pt-pf">✓proof</span>':''}</div>`).join('')+'</div>';
+    if(lbMode==='priv'&&e.tasks.length) priv='<div class="priv-tasks">'+e.tasks.map(t=>`<div class="ptrow">${t.e} ${t.name}${t.duration?` <span class="pt-dur">${t.duration}</span>`:''} <span class="pt-pts">+${t.pts}</span>${t.bonus>0?`<span class="pt-bon">+${t.bonus}🔥</span>`:''}${t.proof?'<span class="pt-pf">✓proof</span>':''}</div>`).join('')+'</div>';
     const card=document.createElement('div');
     card.className='rk '+rc; card.style.animationDelay=(i*65)+'ms';
     card.innerHTML=`<div class="rk-n ${nc}">${re}</div>
@@ -695,8 +775,6 @@ async function renderPrivateJournal(listEl){
   const goalBase=goalTasks.reduce((s,t)=>s+(t.base||10),0);
   const totalBonus=tasks.reduce((s,t)=>s+(t.bonus||0),0);
   const total=ud.score||0;
-  const goals=getGoals(), doneIds=getDoneGoals();
-  const completedGoals=goals.filter(g=>doneIds.includes(g.id));
   const savedRefl=localStorage.getItem('refl_'+USER+'_'+day)||'';
   const dateStr=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   listEl.innerHTML=`
@@ -715,13 +793,13 @@ async function renderPrivateJournal(listEl){
 <div class="j-card">
   <div class="j-card-ttl">💪 Work Sessions</div>
   ${workTasks.length
-    ? [...workTasks].reverse().map(t=>`<div class="j-task"><span class="j-task-ico">${t.e}</span><div class="j-task-i"><div class="j-task-nm">${escHtml(t.name)}</div><div class="j-task-meta">${t.time}${t.bonus>0?' · +'+t.bonus+' streak bonus':''}</div></div><div class="j-task-pts">+${t.pts}</div></div>`).join('')
+    ? [...workTasks].reverse().map(t=>`<div class="j-task"><span class="j-task-ico">${t.e}</span><div class="j-task-i"><div class="j-task-nm">${escHtml(t.name)}</div><div class="j-task-meta">${t.time}${t.duration?' · '+t.duration:''}${t.bonus>0?' · +'+t.bonus+' streak bonus':''}</div></div><div class="j-task-pts">+${t.pts}</div></div>`).join('')
     : '<div class="j-empty">No work sessions logged yet today</div>'}
 </div>
 <div class="j-card">
   <div class="j-card-ttl">⭐ Goals Completed</div>
-  ${completedGoals.length
-    ? completedGoals.map(g=>`<div class="j-task"><span class="j-task-ico">✅</span><div class="j-task-i"><div class="j-task-nm">${escHtml(g.text)}</div></div><div class="j-task-pts">+10</div></div>`).join('')
+  ${goalTasks.length
+    ? goalTasks.map(t=>`<div class="j-task"><span class="j-task-ico">✅</span><div class="j-task-i"><div class="j-task-nm">${escHtml(t.name.replace('⭐ ',''))}</div><div class="j-task-meta">${t.duration||''}${t.bonus>0?' · +'+t.bonus+' streak bonus':''}</div></div><div class="j-task-pts">+${t.pts}</div></div>`).join('')
     : '<div class="j-empty">No goals completed yet today</div>'}
 </div>
 <div class="j-card">
@@ -825,7 +903,7 @@ function renderGoalsList(){
     d.innerHTML=`
       <div class="goal-check${isDone?' checked':''}" onclick="toggleGoal('${g.id}')">${isDone?'✓':''}</div>
       <div class="goal-text${isDone?' struck':''}">${escHtml(g.text)}</div>
-      <div class="goal-pts">${isDone?'✅':'+10'}</div>
+      <div class="goal-pts">${isDone?'<span style="color:var(--gr);font-size:.85rem">✅</span>':'<span style="color:var(--txd);font-size:.7rem;line-height:1.2;text-align:right">up to<br><strong style="color:var(--pul);font-family:\'Rajdhani\',sans-serif;font-size:.95rem">38</strong> pts</span>'}</div>
       <button class="goal-del" onclick="deleteGoal('${g.id}')" title="Remove goal">✕</button>`;
     el.appendChild(d);
   });
@@ -837,19 +915,49 @@ async function toggleGoal(id){
   if(!USER) return;
   const done=getDoneGoals();
   if(done.includes(id)){ showToast('Already completed today! ✅'); return; }
-  markGoalDone(id);
+  openGoalModal(id);
+}
 
-  // Award 10 pts (+ streak bonus)
+function openGoalModal(id){
+  const goals=getGoals(), goal=goals.find(g=>g.id===id);
+  if(!goal) return;
+  pendingGoalId=id;
+  selGoalDuration=DURATIONS[1]; // default 30min
+  document.getElementById('gm-goal-name').textContent=goal.text;
+  document.getElementById('goal-modal').classList.add('open');
+  document.querySelectorAll('#goal-dur-grid .durbtn').forEach((b,i)=>b.classList.toggle('sel',i===1));
+  updGoalPts();
+}
+
+function closeGoalModal(){
+  document.getElementById('goal-modal').classList.remove('open');
+  pendingGoalId=null;
+}
+
+async function updGoalPts(){
+  const users=await getUsers(), streak=(users[USER]||{}).streak||0;
+  const base=Math.round(15*selGoalDuration.mult);
+  const bonus=Math.round(base*sBonusPct(streak));
+  const total=base+bonus;
+  document.getElementById('goal-bon-info').textContent=streak>0
+    ?`⭐ ${selGoalDuration.label} = ${base} pts + ${bonus} streak bonus = ${total} pts total`
+    :`⭐ ${selGoalDuration.label} = ${total} pts earned`;
+}
+
+async function submitGoalCompletion(){
+  if(!USER||!pendingGoalId) return;
+  markGoalDone(pendingGoalId);
   const day=today(), daily=await getDaily(day), users=await getUsers();
   if(!daily[USER]) daily[USER]={score:0,tasks:[]};
-  const goals=getGoals(), goal=goals.find(g=>g.id===id);
+  const goals=getGoals(), goal=goals.find(g=>g.id===pendingGoalId);
   const streak=(users[USER]||{}).streak||0;
-  const base=10, bonus=Math.round(base*sBonusPct(streak)), total=base+bonus;
-  const task={ id:Date.now(), name:'⭐ '+(goal?goal.text:'Daily Goal'), type:'goal', e:'⭐', pts:total, base, bonus, proof:false, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
+  const base=Math.round(15*selGoalDuration.mult);
+  const bonus=Math.round(base*sBonusPct(streak)), total=base+bonus;
+  const task={ id:Date.now(), name:'⭐ '+(goal?goal.text:'Daily Goal'), type:'goal', e:'⭐', pts:total, base, bonus, proof:false, duration:selGoalDuration.label, time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) };
   daily[USER].tasks.push(task); daily[USER].score+=total;
   await setDaily(day,daily);
   const ur=users[USER]||{}; ur.totalPts=(ur.totalPts||0)+total; users[USER]=ur; await setUsers(users);
-  renderGoalsList(); dropConfetti();
+  closeGoalModal(); renderGoalsList(); dropConfetti();
   showToast(bonus>0?`Goal done! +${base} pts + ${bonus} streak bonus 🔥⭐`:`Goal done! +${total} pts ⭐`);
   await checkWinner();
   if(curTab==='home') await refreshHome();
